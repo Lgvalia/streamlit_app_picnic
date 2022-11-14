@@ -8,6 +8,9 @@ st.write('# Which Platform Users Click First')
 #Main Df
 df = pd.read_csv('WhatsgoodlyData-10.csv')
 
+#Pie Chart
+data_pie = df.groupby(by='Answer')['Count'].sum().reset_index()
+
 #Df for Custom Segment
 d1 = df.loc[df['Segment Type']=='Custom']
 d2 = d1.loc[d1['Segment Description'].str.split(' ').str.get(0)=='Graduation']
@@ -21,11 +24,23 @@ d3['Segment SubCategory'] = d3['Segment Description'].str.split('?').str.get(1)
 df_custom = pd.concat([d1,d3])
 data_custom = df_custom.groupby(by=['Segment Category','Segment SubCategory','Answer'])['Count'].sum().reset_index()
 
+#Data for University
+data_university = df.loc[df['Segment Type']=='University'].groupby(by=['Segment Description','Answer'])['Count'].sum().reset_index()
+
+#Data for others
+data_others = df.loc[~(df['Segment Type'].isin(['University','Custom']))].groupby(by=['Segment Type','Segment Description','Answer'])['Count'].sum().reset_index()
 
 
-tab1, tab2, = st.tabs(["Summary", "Details"])
+
+tab1, tab2, = st.tabs(["Summary", "In-Depth"])
 
 with tab1:
+    st.write( ' Total Number of Respondents: {:,}'.format(df['Count'].sum()))
+
+    fig_pie = px.pie(data_pie, values='Count', names='Answer', hole=0.3)
+    fig_pie.update_traces(textposition='inside', textinfo='percent+label')
+    fig_pie.update_layout(title="Respondents Percentages by Platform")
+    st.plotly_chart(fig_pie)
    
     # -- Create the figure in Plotly
     data = df.groupby(by=['Segment Type','Answer'])['Count'].sum().reset_index()
@@ -43,15 +58,45 @@ with tab1:
     st.plotly_chart(fig_pct, use_container_width=True)
 
 with tab2:
-   st.write('Custom Segmet Type by Sub Categories')
-   category_choice = st.selectbox(
+    #Custom
+    st.write('Custom Segmet Type by Sub Categories')
+    category_choice = st.selectbox(
         "Choose Category",
         (['All'] + df_custom['Segment Category'].unique().tolist()),
     ) 
-   if category_choice != "All":
+    if category_choice != "All":
         filtered_df = data_custom[data_custom['Segment Category'] == category_choice]
-   else: filtered_df = data_custom
-   fig_custom = px.treemap(filtered_df, path=['Segment Category', 'Segment SubCategory', 'Answer'], values='Count')
-   fig_custom.data[0].textinfo = 'label+value'
-   #fig_custom.update_layout(title="Custom Segmet Type by Sub Categories")
-   st.plotly_chart(fig_custom, use_container_width=True)
+    else: filtered_df = data_custom
+    fig_custom = px.treemap(filtered_df, path=['Segment Category', 'Segment SubCategory', 'Answer'], values='Count')
+    fig_custom.data[0].textinfo = 'label+value'
+    #fig_custom.update_layout(title="Custom Segmet Type by Sub Categories")
+    st.plotly_chart(fig_custom, use_container_width=True)
+    
+    #University     
+    st.write('By Universities')
+    university_choice = st.multiselect(
+        "Choose University",
+        (data_university['Segment Description'].unique().tolist()),
+    )
+    if  len(university_choice) == 0:
+        uni_filtered_data = data_university
+    else: uni_filtered_data = data_university.loc[data_university['Segment Description'].isin(university_choice)]
+    
+    fig_university = px.treemap(uni_filtered_data, path=['Segment Description', 'Answer'], values='Count')
+    fig_university.data[0].textinfo = 'label+value'
+    st.plotly_chart(fig_university)
+
+    #Others
+    st.write('By Other Segments')
+    other_choice = st.selectbox(
+        "Choose Category",
+        (['All'] + data_others['Segment Type'].unique().tolist()),
+    ) 
+    if other_choice != "All":
+        other_filtered_df = data_others[data_others['Segment Type'] == other_choice]
+    else: other_filtered_df = data_others
+    
+    fig_others = px.treemap(other_filtered_df, path=['Segment Type','Segment Description', 'Answer'], values='Count')
+    fig_others.data[0].textinfo = 'label+value'
+    #fig_custom.layout.values.tickformat = ',.2%'
+    st.plotly_chart(fig_others, use_container_width=True)
