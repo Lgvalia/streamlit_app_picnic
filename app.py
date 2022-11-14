@@ -4,6 +4,7 @@ import pandas as pd
 
 st.write('# Which Platform Users Click First')
 
+
 #Prepare Data
 #Main Df
 df = pd.read_csv('WhatsgoodlyData-10.csv')
@@ -35,6 +36,7 @@ data_others = df.loc[~(df['Segment Type'].isin(['University','Custom']))].groupb
 tab1, tab2, = st.tabs(["Summary", "In-Depth"])
 
 with tab1:
+    
     st.write( ' Total Number of Respondents: {:,}'.format(df['Count'].sum()))
 
     fig_pie = px.pie(data_pie, values='Count', names='Answer', hole=0.3)
@@ -62,12 +64,12 @@ with tab2:
     st.write('Custom Segmet Type by Sub Categories')
     category_choice = st.selectbox(
         "Choose Category",
-        (['All'] + df_custom['Segment Category'].unique().tolist()),
+        (['All'] + data_custom['Segment Category'].unique().tolist()),
     ) 
     if category_choice != "All":
         filtered_df = data_custom[data_custom['Segment Category'] == category_choice]
     else: filtered_df = data_custom
-    fig_custom = px.treemap(filtered_df, path=['Segment Category', 'Segment SubCategory', 'Answer'], values='Count')
+    fig_custom = px.treemap(filtered_df, path=[px.Constant("all"),'Segment Category', 'Segment SubCategory', 'Answer'], values='Count')
     fig_custom.data[0].textinfo = 'label+value'
     #fig_custom.update_layout(title="Custom Segmet Type by Sub Categories")
     st.plotly_chart(fig_custom, use_container_width=True)
@@ -82,7 +84,7 @@ with tab2:
         uni_filtered_data = data_university
     else: uni_filtered_data = data_university.loc[data_university['Segment Description'].isin(university_choice)]
     
-    fig_university = px.treemap(uni_filtered_data, path=['Segment Description', 'Answer'], values='Count')
+    fig_university = px.treemap(uni_filtered_data, path=[px.Constant("all"),'Segment Description', 'Answer'], values='Count')
     fig_university.data[0].textinfo = 'label+value'
     st.plotly_chart(fig_university)
 
@@ -96,7 +98,7 @@ with tab2:
         other_filtered_df = data_others[data_others['Segment Type'] == other_choice]
     else: other_filtered_df = data_others
     
-    fig_others = px.treemap(other_filtered_df, path=['Segment Type','Segment Description', 'Answer'], values='Count')
+    fig_others = px.treemap(other_filtered_df, path=[px.Constant("all"),'Segment Type','Segment Description', 'Answer'], values='Count')
     fig_others.data[0].textinfo = 'label+value'
     #fig_custom.layout.values.tickformat = ',.2%'
     st.plotly_chart(fig_others, use_container_width=True)
