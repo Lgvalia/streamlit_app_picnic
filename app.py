@@ -2,7 +2,7 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 
-st.write('# Demo App')
+st.write('# Which Social Platform Do Users click first')
 
 # -- Get the user input
 year_col, continent_col, log_x_col = st.columns([5, 5, 5])
