@@ -39,24 +39,27 @@ with tab1:
     
     st.write( ' Total Number of Respondents: {:,}'.format(df['Count'].sum()))
 
+    #Pie Chart
     fig_pie = px.pie(data_pie, values='Count', names='Answer', hole=0.3)
     fig_pie.update_traces(textposition='inside', textinfo='percent+label')
     fig_pie.update_layout(title="Respondents Percentages by Platform")
     st.plotly_chart(fig_pie)
    
-    # -- Create the figure in Plotly
+    # Segment Counts
     data = df.groupby(by=['Segment Type','Answer'])['Count'].sum().reset_index()
     fig = px.bar(data, x='Segment Type',y='Count', color='Answer', text_auto=True, barmode='stack')
     fig.show()
     fig.update_layout(title="Platform Count by Segment Types")
+    #fig.update_layout(margin = dict(t=0.2, l=0.2, r=0.2, b=0.2))
     # -- Input the Plotly chart to the Streamlit interface
     st.plotly_chart(fig, use_container_width=True)
 
-
+    #segment percents
     data['Percentage'] = data['Count'] / data.groupby(by=['Segment Type'])['Count'].transform('sum')
     fig_pct = px.bar(data, x='Segment Type',y='Percentage', color='Answer', text_auto=True, barmode='stack')
     fig_pct.layout.yaxis.tickformat = ',.2%'
     fig_pct.update_layout(title="Platform Percents by Segment Types")
+    #fig_pct.update_layout(margin = dict(t=0.2, l=0.2, r=0.2, b=0.2))
     st.plotly_chart(fig_pct, use_container_width=True)
 
 with tab2:
@@ -71,6 +74,7 @@ with tab2:
     else: filtered_df = data_custom
     fig_custom = px.treemap(filtered_df, path=[px.Constant("all"),'Segment Category', 'Segment SubCategory', 'Answer'], values='Count')
     fig_custom.data[0].textinfo = 'label+value'
+    fig_custom.update_layout(margin = dict(t=0, l=0, r=0, b=0))
     #fig_custom.update_layout(title="Custom Segmet Type by Sub Categories")
     st.plotly_chart(fig_custom, use_container_width=True)
     
@@ -86,6 +90,7 @@ with tab2:
     
     fig_university = px.treemap(uni_filtered_data, path=[px.Constant("all"),'Segment Description', 'Answer'], values='Count')
     fig_university.data[0].textinfo = 'label+value'
+    fig_university.update_layout(margin = dict(t=0, l=0, r=0, b=0))
     st.plotly_chart(fig_university)
 
     #Others
@@ -100,5 +105,6 @@ with tab2:
     
     fig_others = px.treemap(other_filtered_df, path=[px.Constant("all"),'Segment Type','Segment Description', 'Answer'], values='Count')
     fig_others.data[0].textinfo = 'label+value'
+    fig_others.update_layout(margin = dict(t=0, l=0, r=0, b=0))
     #fig_custom.layout.values.tickformat = ',.2%'
     st.plotly_chart(fig_others, use_container_width=True)
