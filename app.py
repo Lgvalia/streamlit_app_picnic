@@ -74,7 +74,7 @@ with tab2:
     else: filtered_df = data_custom
     fig_custom = px.treemap(filtered_df, path=[px.Constant("all"),'Segment Category', 'Segment SubCategory', 'Answer'], values='Count')
     fig_custom.data[0].textinfo = 'label+value'
-    fig_custom.update_layout(margin = dict(t=1, l=0, r=0, b=0))
+    fig_custom.update_layout(margin = dict(t=10, l=0, r=0, b=0))
     #fig_custom.update_layout(title="Custom Segmet Type by Sub Categories")
     st.plotly_chart(fig_custom, use_container_width=True)
     
@@ -90,7 +90,7 @@ with tab2:
     
     fig_university = px.treemap(uni_filtered_data, path=[px.Constant("all"),'Segment Description', 'Answer'], values='Count')
     fig_university.data[0].textinfo = 'label+value'
-    fig_university.update_layout(margin = dict(t=1, l=0, r=0, b=0))
+    fig_university.update_layout(margin = dict(t=10, l=0, r=0, b=0))
     st.plotly_chart(fig_university)
 
     #Others
@@ -105,6 +105,6 @@ with tab2:
     
     fig_others = px.treemap(other_filtered_df, path=[px.Constant("all"),'Segment Type','Segment Description', 'Answer'], values='Count')
     fig_others.data[0].textinfo = 'label+value'
-    fig_others.update_layout(margin = dict(t=1, l=0, r=0, b=0))
+    fig_others.update_layout(margin = dict(t=10, l=0, r=0, b=0))
     #fig_custom.layout.values.tickformat = ',.2%'
     st.plotly_chart(fig_others, use_container_width=True)
